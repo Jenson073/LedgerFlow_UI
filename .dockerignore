@@ -1,0 +1,28 @@
+# Node modules & dependencies
+node_modules/
+
+# Local build / cache outputs
+.nuxt/
+.output/
+dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Git
+.git/
+.gitignore
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Docker configuration
+Dockerfile
+.dockerignore
+
+# Readme / Documentation
+README.md
