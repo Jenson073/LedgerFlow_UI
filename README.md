@@ -57,6 +57,15 @@ src/
 └── app.vue                     # Global entrypoint rendering the active Nuxt route
 ```
 
+### Inner Folder Structure of a Domain Module
+Within each domain folder (e.g., `src/domains/invoice/`), the code is divided into standard subfolders based on architectural responsibility:
+- **`types/`**: Holds TypeScript interfaces and type definitions (e.g., `Invoice` and `CreateInvoiceInput`) defining the domain's core data structures.
+- **`services/`**: Implements domain operations and interacts with data repositories (e.g., reading/writing data lists to LocalStorage, validating business parameters).
+- **`store/`**: Defines the Pinia state management store (e.g., `useInvoiceStore`) to hold current reactive state lists and expose actions.
+- **`composables/`**: Exposes lightweight Vue composition functions (e.g., `useInvoice`) wrapping store states and methods for presentation binding.
+- **`components/`**: Holds isolated UI elements specific only to this domain (e.g., `InvoiceTable` lists, `InvoiceForm` modal inputs).
+- **`pages/`**: Contains page shell views or containers specific to that feature (e.g., `LoginPage` inside the `auth` domain).
+
 ### Why use DDD on the Frontend?
 1. **High Cohesion**: All files relating to a single feature (e.g., Invoices) sit in the same folder. If you need to edit how invoices work, you only look inside `src/domains/invoice/`.
 2. **Low Coupling**: Domains do not directly touch each other's private components or stores unless explicitly imported.
@@ -121,15 +130,25 @@ Here is how data flows through the application:
 
 ## 🐳 Docker Deployment
 
-You can also run LedgerFlow inside a container. The project is equipped with a production-ready, multi-stage `Dockerfile`.
+You can run LedgerFlow inside a container. The project is equipped with a production-ready, multi-stage `Dockerfile`.
 
-### Build the Docker Image
+### Pull from Docker Hub (Recommended)
+This application has been precompiled and pushed to Docker Hub. You can pull the latest image and run it directly without building locally:
 ```bash
-docker build -t ledgerflow-app .
+# Pull the latest image from Docker Hub
+docker pull jenson07/ledgerflow-app-nuxt:latest
+
+# Run the container mapping it to port 3000
+docker run -p 3000:3000 jenson07/ledgerflow-app-nuxt:latest
 ```
 
-### Run the Container
+### Build the Docker Image Locally
+If you want to compile and build the container locally from the source files:
 ```bash
+# Build the Docker image
+docker build -t ledgerflow-app .
+
+# Run the local container
 docker run -p 3000:3000 ledgerflow-app
 ```
 Once running, you can access the application at `http://localhost:3000`.
