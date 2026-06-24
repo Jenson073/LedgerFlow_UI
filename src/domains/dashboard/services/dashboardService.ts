@@ -11,14 +11,11 @@ export const dashboardService = {
     expenses: Expense[],
     bankRecords: BankRecord[]
   ): DashboardStats => {
-    // 1. Total Income (Paid Invoices)
-    const paidInvoices = invoices.filter((inv) => inv.status === 'Paid');
-    const totalIncome = paidInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+    // 1. Total Income (Receipts)
+    const totalIncome = receipts.reduce((sum, rec) => sum + rec.amount, 0);
 
-    // 2. Total Expenses (General Expenses + Receipts)
-    const totalGeneralExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-    const totalReceipts = receipts.reduce((sum, rec) => sum + rec.amount, 0);
-    const totalExpenses = totalGeneralExpenses + totalReceipts;
+    // 2. Total Expenses (General Expenses)
+    const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
     // 3. Net Cashflow
     const netCashflow = totalIncome - totalExpenses;
@@ -44,19 +41,13 @@ export const dashboardService = {
       // We will extract dates matching '2026-04-*', '2026-05-*', '2026-06-*'
       const monthPrefix = `2026-0${idx + 4}`;
       
-      const monthlyIncome = invoices
-        .filter((inv) => inv.status === 'Paid' && inv.issueDate.startsWith(monthPrefix))
-        .reduce((sum, inv) => sum + inv.amount, 0);
-
-      const monthlyGenExpense = expenses
-        .filter((exp) => exp.date.startsWith(monthPrefix))
-        .reduce((sum, exp) => sum + exp.amount, 0);
-
-      const monthlyReceipts = receipts
+      const monthlyIncome = receipts
         .filter((rec) => rec.date.startsWith(monthPrefix))
         .reduce((sum, rec) => sum + rec.amount, 0);
 
-      const monthlyExpense = monthlyGenExpense + monthlyReceipts;
+      const monthlyExpense = expenses
+        .filter((exp) => exp.date.startsWith(monthPrefix))
+        .reduce((sum, exp) => sum + exp.amount, 0);
 
       // Add a baseline value so the chart has data even if lists are modified
       const baseIncome = [8200, 7700, 0][idx]; // Adjusting base to make April/May look realistic

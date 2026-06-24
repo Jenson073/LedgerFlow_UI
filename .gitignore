@@ -17,6 +17,9 @@ logs
 .DS_Store
 .fleet
 .idea
+.vscode
+.gemini
+.agents
 
 # Local env files
 .env

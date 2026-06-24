@@ -1,6 +1,6 @@
 <template>
-  <form class="auth-form" @submit.prevent="handleSubmit"><!-- Prevents reload of page on submission -->
-    <div v-if="error" class="form-error-alert" role="alert">
+  <form class="flex flex-col gap-5 w-full" @submit.prevent="handleSubmit"><!-- Prevents reload of page on submission -->
+    <div v-if="error" class="error-shake p-3 rounded-md bg-danger/15 border border-danger/20 text-red-300 text-[0.85rem] font-medium text-left" role="alert">
       {{ error }}
     </div>
     <!-- Sends props to the input component -->
@@ -24,22 +24,22 @@
       :disabled="loading"
     />
 
-    <div class="form-actions">
+    <div class="mt-2">
       <AppButton
         type="submit"
         variant="primary"
         :loading="loading"
-        class="submit-button"
+        class="w-full py-3"
       >
         Sign In
       </AppButton>
     </div>
 
-    <p class="form-toggle-text">
+    <p class="text-[0.85rem] text-text-muted m-0 text-center">
       Don't have an account?
       <button
         type="button"
-        class="toggle-link-btn"
+        class="bg-transparent border-none text-accent font-medium cursor-pointer p-0 font-inherit hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         :disabled="loading"
         @click="$emit('switch-view', 'signup')"
       >
@@ -48,10 +48,10 @@
     </p>
 
     <!-- Help Note -->
-    <div class="help-box">
-      <p class="help-title">💡 Demo Access Credentials</p>
-      <p>Email: <code>accountant@example.com</code></p>
-      <p>Password: <code>password123</code></p>
+    <div class="mt-2 p-3 rounded-md bg-white/[0.03] border border-white/[0.05] text-[0.775rem] text-text-muted text-left">
+      <p class="font-semibold text-text-base mt-0 mb-1.5">💡 Demo Access Credentials</p>
+      <p class="m-0 mb-1">Email: <code class="text-accent-alt font-semibold">accountant@example.com</code></p>
+      <p class="m-0 mb-1 last:mb-0">Password: <code class="text-accent-alt font-semibold">password123</code></p>
     </div>
   </form>
 </template>
@@ -65,7 +65,7 @@ import { useAuth } from '../composables/useAuth';
 const emit = defineEmits<{
   (e: 'switch-view', view: 'signup'): void; 
   (e: 'login-success'): void;
-}>();
+ }>();
 
 const { login, loading, error } = useAuth();
 
@@ -85,84 +85,8 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  width: 100%;
-}
-
-.form-error-alert {
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-md, 8px);
-  background-color: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-align: left;
+.error-shake {
   animation: shake 0.4s ease-in-out;
-}
-
-.form-actions {
-  margin-top: 0.5rem;
-}
-
-.submit-button {
-  width: 100%;
-  padding-block: 0.75rem;
-}
-
-.form-toggle-text {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  margin: 0;
-  text-align: center;
-}
-
-.toggle-link-btn {
-  background: none;
-  border: none;
-  color: var(--color-accent);
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0;
-  font-family: inherit;
-}
-
-.toggle-link-btn:hover {
-  text-decoration: underline;
-}
-
-.help-box {
-  margin-top: 0.5rem;
-  padding: 0.75rem;
-  border-radius: var(--radius-md, 8px);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 0.775rem;
-  color: var(--color-text-muted);
-  text-align: left;
-}
-
-.help-title {
-  font-weight: 600;
-  color: var(--color-text-base);
-  margin-top: 0;
-  margin-bottom: 0.375rem;
-}
-
-.help-box p {
-  margin: 0 0 0.25rem 0;
-}
-
-.help-box p:last-child {
-  margin-bottom: 0;
-}
-
-.help-box code {
-  color: var(--color-accent-alt, #a78bfa);
-  font-weight: 600;
 }
 
 @keyframes shake {
@@ -171,3 +95,4 @@ const handleSubmit = async () => {
   75% { transform: translateX(6px); }
 }
 </style>
+

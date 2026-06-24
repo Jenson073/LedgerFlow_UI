@@ -1,8 +1,30 @@
 # 📊 LedgerFlow — Domain-Driven Accounting Dashboard
 
-LedgerFlow is a modern, high-performance accountant tracking frontend dashboard built from scratch using **Nuxt.js (Vue 3)**, **Pinia**, and **TypeScript**, styled with premium **Vanilla CSS** featuring dark/light mode compatibility and a Glassmorphism aesthetic.
+LedgerFlow is a modern, high-performance accountant tracking frontend dashboard built from scratch using **Nuxt.js (Vue 3)**, **Pinia**, and **TypeScript**. 
 
 This application runs entirely on the client-side with mock database operations backed by **LocalStorage**, allowing full functionality (authentication, data additions, metrics computation, dynamic SVG charts) without any backend server.
+
+---
+
+## 🌟 Project Versions
+
+LedgerFlow is developed across two major version releases:
+
+### 🚀 Version 2.0 (Current — Tailwind CSS & Receipts Logic)
+- **Styling**: Migrated entirely to **Tailwind CSS** integrated with a dynamic, CSS variable-based theming engine (fully supporting light/dark schemes and customizable in [main.css](file:///home/user/Desktop/frontend_vue_nuxt/src/assets/main.css)).
+- **Core Accounting Logic**: 
+  - **Total Income**: Computed from merchant/customer **receipts** (`receipts`).
+  - **Total Expenses**: Computed from logged **operational expenses** (`expenses`).
+  - **Outstanding Dues**: Computed from **Pending** and **Overdue** invoices.
+  - **Interactive Actions**: The "Mark Paid" trigger in the invoice ledger is styled as a responsive solid accent button.
+
+### 📜 Version 1.0 (Legacy — Vanilla CSS & Paid Invoices Logic)
+- **Styling**: Styled using premium **Vanilla CSS** featuring glassmorphism and custom animation components.
+- **Core Accounting Logic**:
+  - **Total Income**: Computed from invoices marked with status `'Paid'`.
+  - **Total Expenses**: Computed from the sum of general expenses and merchant receipts.
+  - **Outstanding Dues**: Computed from unpaid customer invoices.
+- **Git Tag**: This stable version has been pushed to Git under the tag `v1.0`.
 
 ---
 
@@ -17,7 +39,7 @@ Initialize the project libraries and dependencies:
 npm install
 ```
 
-### 2. Run the Development Server
+### 2. Run the Development Server (Version 2.0)
 Spin up the local hot-reloading development environment:
 ```bash
 npm run dev
@@ -73,6 +95,19 @@ Within each domain folder (e.g., `src/domains/invoice/`), the code is divided in
 
 ---
 
+## 🎨 Global Theme Engine (Version 2.0)
+
+In Version 2.0, theme styles are unified under Tailwind CSS class abstractions while preserving full dynamic theme-switch capabilities. 
+
+All primary tokens are declared as global CSS properties inside [main.css](file:///home/user/Desktop/frontend_vue_nuxt/src/assets/main.css):
+- `bg-accent` maps to the violet/purple accent color: `var(--color-accent)`.
+- `text-text-muted` maps to `var(--color-text-muted)`.
+- Surface and background cards use glassmorphism variables: `var(--surface-bg-card)`.
+
+To modify the color palette, fonts, or rounding system globally, modify the variables within the `:root` selector of [main.css](file:///home/user/Desktop/frontend_vue_nuxt/src/assets/main.css). Tailwind config compiles these values dynamically.
+
+---
+
 ## 💡 Nuxt.js Concepts for Beginners
 
 If you are new to Nuxt, here is a beginner-friendly breakdown of how the framework works under the hood:
@@ -112,12 +147,13 @@ Here is how data flows through the application:
 2. **Submitting Credentials**: Entering email/password inside `LoginForm` calls the `login()` action in `authStore`.
 3. **Session Verification**: The `authService` checks the values in `localStorage`. If matching, it returns user data, sets the active session in `localStorage`, and updates the store state, triggering a redirect to `/dashboard`.
 
-### 📊 Dashboard & Calculations Flow
+### 📊 Dashboard & Calculations Flow (Version 2.0)
 1. **Page Mount**: When `DashboardPage` loads, it triggers a parallel fetch of all data points (Invoices, Receipts, Expenses, and Bank Ledger records) from local storage.
 2. **Stats Calculator**: The `dashboardService.calculateStats()` function runs over these lists:
-   - **Total Income**: Sum of invoices with status `'Paid'`.
-   - **Total Expenses**: Sum of general expenses + merchant receipts.
+   - **Total Income**: Sum of all **merchant receipts** (`receipts`).
+   - **Total Expenses**: Sum of all logged **operational expenses** (`expenses`).
    - **Net Cashflow**: `Total Income - Total Expenses`.
+   - **Outstanding Dues**: Sum of customer invoices with status `'Pending'` or `'Overdue'`.
    - **Bank Balance**: Taken from the latest bank statement transaction ledger balance.
    - **Monthly Trends**: Grouped by transaction dates to build the X-axis coordinate values.
 3. **SVG Chart Drawing**: The calculated trend arrays are passed into `StatsChart.vue`. The component scales these values into coordinates matching a SVG viewport box (`0 0 500 220`) and outputs responsive SVG paths with gradient area fills.

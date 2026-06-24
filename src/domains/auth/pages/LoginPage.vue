@@ -1,19 +1,19 @@
 <template>
-  <div class="auth-card">
-    <div class="auth-header">
-      <div class="brand-logo" aria-hidden="true">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <div class="w-full max-w-[26rem] bg-bg-card/45 border border-border rounded-lg px-8 py-9 backdrop-blur-xl saturate-[180%] shadow-2xl flex flex-col gap-7 text-center transition-all duration-300">
+    <div class="flex flex-col items-center gap-2">
+      <div class="flex items-center justify-center w-14 h-14 rounded-md bg-gradient-to-br from-accent to-accent-alt text-bg-canvas shadow-accent mb-2" aria-hidden="true">
+        <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
           <path d="M18.375 2.25c-1.035 0-1.875.84-1.875 1.875v15.75c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V4.125c0-1.036-.84-1.875-1.875-1.875h-.75ZM9.75 8.625c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-.75a1.875 1.875 0 0 1-1.875-1.875V8.625ZM3 13.125c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v6.75c0 1.035-.84 1.875-1.875 1.875h-.75A1.875 1.875 0 0 1 3 20v-6.75Z" />
         </svg>
       </div>
-      <h1 class="auth-title">LedgerFlow</h1>
-      <p class="auth-subtitle">Professional Accountant Tracking & Analytics</p>
+      <h1 class="m-0 text-3.5xl font-extrabold tracking-tight bg-gradient-to-r from-text-base to-text-muted bg-clip-text text-transparent">LedgerFlow</h1>
+      <p class="m-0 text-[0.85rem] text-text-muted font-medium">Professional Accountant Tracking & Analytics</p>
     </div>
 
     <!-- Toggle Forms -->
-    <div class="auth-body">
-      <h2 class="form-title">{{ viewMode === 'login' ? 'Welcome Back' : 'Get Started' }}</h2>
-      <p class="form-subtitle">
+    <div class="flex flex-col gap-1 text-left">
+      <h2 class="m-0 text-xl font-semibold text-text-base">{{ viewMode === 'login' ? 'Welcome Back' : 'Get Started' }}</h2>
+      <p class="m-0 mb-5 text-[0.85rem] text-text-muted leading-relaxed">
         {{ viewMode === 'login' ? 'Sign in to access your financial tracking dashboard.' : 'Register a new accountant ledger space.' }}
       </p>
 
@@ -49,84 +49,3 @@ const onAuthSuccess = () => {
 };
 </script>
 
-<style scoped>
-.auth-card {
-  width: 100%;
-  max-width: 26rem;
-  background: var(--surface-bg-card, rgba(30, 41, 59, 0.45));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  border-radius: var(--radius-lg, 16px);
-  padding: 2.25rem 2rem;
-  backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.auth-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.brand-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: var(--radius-md, 10px);
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-alt));
-  color: var(--color-bg-base, #0f172a);
-  box-shadow: 0 8px 16px var(--shadow-accent);
-  margin-bottom: 0.5rem;
-}
-
-.brand-logo svg {
-  width: 2rem;
-  height: 2rem;
-}
-
-.auth-title {
-  margin: 0;
-  font-size: 1.85rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  background: linear-gradient(to right, #f8fafc, #cbd5e1);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.auth-subtitle {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  font-weight: 500;
-}
-
-.auth-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  text-align: left;
-}
-
-.form-title {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--color-text-base);
-}
-
-.form-subtitle {
-  margin: 0 0 1.25rem 0;
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  line-height: 1.4;
-}
-</style>

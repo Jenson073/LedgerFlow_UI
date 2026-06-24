@@ -4,7 +4,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   srcDir: 'src/',
   modules: [
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    '@nuxtjs/tailwindcss'
   ],
   css: [
     '~/assets/main.css'

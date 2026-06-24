@@ -1,24 +1,26 @@
 <template>
-  <div class="records-container">
+  <div class="flex flex-col gap-5 w-full">
     <!-- Controls Bar -->
-    <div class="controls-bar">
-      <div class="search-filter-group">
+    <div class="flex justify-between items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-3 flex-wrap">
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Search by client..."
-          class="table-search-input"
+          class="px-3.5 py-2 text-sm text-text-base bg-bg-input border border-border rounded-md outline-none transition-all duration-200 w-60 focus:border-accent focus:bg-bg-input-focus focus:shadow-[0_0_0_3px_var(--color-accent-subtle)]"
         />
-        <select v-model="statusFilter" class="table-filter-select">
-          <option value="All">All Statuses</option>
-          <option value="Paid">Paid</option>
-          <option value="Pending">Pending</option>
-          <option value="Overdue">Overdue</option>
-        </select>
+        <div class="relative flex items-center">
+          <select v-model="statusFilter" class="pl-3.5 pr-8 py-2 text-sm text-text-base bg-bg-input border border-border rounded-md outline-none cursor-pointer transition-all duration-200 appearance-none bg-no-repeat bg-[right_0.5rem_center] bg-[length:1.25rem] focus:border-accent focus:bg-bg-input-focus focus:shadow-[0_0_0_3px_var(--color-accent-subtle)] bg-[url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%2394a3b8%22%3E%3Cpath fill-rule=%22evenodd%22 d=%22M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z%22 clip-rule=%22evenodd%22/%3E%3C/svg%3E')]">
+            <option value="All" class="bg-slate-800 text-slate-100">All Statuses</option>
+            <option value="Paid" class="bg-slate-800 text-slate-100">Paid</option>
+            <option value="Pending" class="bg-slate-800 text-slate-100">Pending</option>
+            <option value="Overdue" class="bg-slate-800 text-slate-100">Overdue</option>
+          </select>
+        </div>
       </div>
       <AppButton variant="primary" @click="$emit('open-create-modal')">
         <template #icon>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="btn-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-[1.15rem] h-[1.15rem]">
             <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
           </svg>
         </template>
@@ -27,51 +29,58 @@
     </div>
 
     <!-- Table Container -->
-    <div class="table-responsive">
-      <div v-if="loading" class="table-loading-overlay">
-        <span class="table-spinner"></span>
-        <p>Updating invoice ledger...</p>
+    <div class="relative w-full overflow-x-auto rounded-md bg-white/[0.01] border border-border">
+      <div v-if="loading" class="absolute inset-0 bg-slate-950/65 backdrop-blur-sm flex flex-col items-center justify-center gap-2 z-10">
+        <span class="w-8 h-8 border-3 border-accent border-r-transparent rounded-full animate-spin"></span>
+        <p class="text-sm font-medium text-text-base">Updating invoice ledger...</p>
       </div>
 
-      <table class="data-table">
+      <table class="w-full border-collapse text-left text-sm">
         <thead>
           <tr>
-            <th>Invoice #</th>
-            <th>Client</th>
-            <th>Issue Date</th>
-            <th>Due Date</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th class="actions-header">Actions</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Invoice #</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Client</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Issue Date</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Due Date</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Amount</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Status</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02] text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="filteredInvoices.length === 0">
-            <td colspan="7" class="empty-table-row">No invoice records found.</td>
+            <td colspan="7" class="text-center p-12 text-text-muted">No invoice records found.</td>
           </tr>
-          <tr v-for="invoice in filteredInvoices" :key="invoice.id" class="table-row">
-            <td class="bold-text">{{ invoice.invoiceNumber }}</td>
-            <td>{{ invoice.clientName }}</td>
-            <td>{{ formatDate(invoice.issueDate) }}</td>
-            <td>{{ formatDate(invoice.dueDate) }}</td>
-            <td class="amount-cell">{{ formatCurrency(invoice.amount) }}</td>
-            <td>
-              <span :class="['status-badge', `status-${invoice.status.toLowerCase()}`]">
+          <tr v-for="invoice in filteredInvoices" :key="invoice.id" class="hover:bg-white/[0.01] transition-colors">
+            <td class="p-4 border-b border-white/[0.04] text-text-base font-semibold">{{ invoice.invoiceNumber }}</td>
+            <td class="p-4 border-b border-white/[0.04] text-text-base">{{ invoice.clientName }}</td>
+            <td class="p-4 border-b border-white/[0.04] text-text-base">{{ formatDate(invoice.issueDate) }}</td>
+            <td class="p-4 border-b border-white/[0.04] text-text-base">{{ formatDate(invoice.dueDate) }}</td>
+            <td class="p-4 border-b border-white/[0.04] text-text-base font-semibold tabular-nums">{{ formatCurrency(invoice.amount) }}</td>
+            <td class="p-4 border-b border-white/[0.04] text-text-base">
+              <span :class="[
+                'inline-flex px-2.5 py-1 rounded-full text-[0.775rem] font-semibold tracking-wide border',
+                invoice.status === 'Paid' ? 'bg-success-subtle text-success border-success/20' :
+                invoice.status === 'Pending' ? 'bg-warning-subtle text-warning border-warning/20' :
+                'bg-danger-subtle text-danger border-danger/20'
+              ]">
                 {{ invoice.status }}
               </span>
             </td>
-            <td class="actions-cell">
-              <AppButton
-                v-if="invoice.status !== 'Paid'"
-                variant="outline"
-                size="sm"
-                @click="onMarkPaid(invoice.id)"
-              >
-                Mark Paid
-              </AppButton>
-              <span v-else class="action-completed-text">
-                No Actions
-              </span>
+            <td class="p-4 border-b border-white/[0.04] text-text-base text-right">
+              <div class="flex justify-end items-center min-h-[2.25rem]">
+                <button
+                  v-if="invoice.status !== 'Paid'"
+                  type="button"
+                  class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-md bg-accent text-bg-canvas hover:bg-accent-alt hover:-translate-y-px active:translate-y-0 shadow-sm transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                  @click="onMarkPaid(invoice.id)"
+                >
+                  Mark Paid
+                </button>
+                <span v-else class="text-[0.775rem] text-text-muted italic">
+                  No Actions
+                </span>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -115,188 +124,3 @@ const onMarkPaid = async (id: string) => {
 };
 </script>
 
-<style scoped>
-.records-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  width: 100%;
-}
-
-.controls-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.search-filter-group {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.table-search-input {
-  padding: 0.5rem 0.875rem;
-  font-family: inherit;
-  font-size: 0.875rem;
-  color: var(--color-text-base);
-  background: var(--surface-bg-input, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  border-radius: var(--radius-md, 8px);
-  outline: none;
-  transition: all 0.2s;
-  min-width: 15rem;
-}
-
-.table-search-input:focus {
-  border-color: var(--color-accent);
-  background: var(--surface-bg-input-focus, rgba(255, 255, 255, 0.08));
-}
-
-.table-filter-select {
-  padding: 0.5rem 2rem 0.5rem 0.875rem;
-  font-family: inherit;
-  font-size: 0.875rem;
-  color: var(--color-text-base);
-  background: var(--surface-bg-input, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  border-radius: var(--radius-md, 8px);
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2394a3b8'%3E%3Cpath fill-rule='evenodd' d='M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z' clip-rule='evenodd'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  background-size: 1.25rem;
-}
-
-.table-filter-select option {
-  background: #1e293b;
-  color: #f8fafc;
-}
-
-.btn-icon {
-  width: 1.15rem;
-  height: 1.15rem;
-}
-
-.table-responsive {
-  position: relative;
-  width: 100%;
-  overflow-x: auto;
-  border-radius: var(--radius-md, 8px);
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-size: 0.9rem;
-}
-
-.data-table th {
-  padding: 0.875rem 1rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.data-table td {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.04));
-  color: var(--color-text-base);
-}
-
-.bold-text {
-  font-weight: 600;
-}
-
-.amount-cell {
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.status-badge {
-  display: inline-flex;
-  padding: 0.25rem 0.625rem;
-  border-radius: 9999px;
-  font-size: 0.775rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.status-paid {
-  background: rgba(16, 185, 129, 0.12);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-.status-pending {
-  background: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.2);
-}
-
-.status-overdue {
-  background: rgba(239, 68, 68, 0.12);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-.actions-header, .actions-cell {
-  text-align: right;
-}
-
-.actions-cell {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  min-height: 2.75rem;
-}
-
-.action-completed-text {
-  font-size: 0.775rem;
-  color: var(--color-text-muted);
-  font-style: italic;
-}
-
-.empty-table-row {
-  text-align: center;
-  padding: 3rem !important;
-  color: var(--color-text-muted);
-}
-
-/* Loading Overlay */
-.table-loading-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(4px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  z-index: 10;
-}
-
-.table-spinner {
-  width: 2rem;
-  height: 2rem;
-  border: 3px solid var(--color-accent);
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-</style>

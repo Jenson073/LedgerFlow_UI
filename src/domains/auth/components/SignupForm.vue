@@ -1,10 +1,10 @@
 <template>
-  <form class="auth-form" @submit.prevent="handleSubmit">
-    <div v-if="error" class="form-error-alert" role="alert">
+  <form class="flex flex-col gap-5 w-full" @submit.prevent="handleSubmit">
+    <div v-if="error" class="error-shake p-3 rounded-md bg-danger/15 border border-danger/20 text-red-300 text-[0.85rem] font-medium text-left" role="alert">
       {{ error }}
     </div>
 
-    <div v-if="validationError" class="form-error-alert" role="alert">
+    <div v-if="validationError" class="error-shake p-3 rounded-md bg-danger/15 border border-danger/20 text-red-300 text-[0.85rem] font-medium text-left" role="alert">
       {{ validationError }}
     </div>
 
@@ -48,22 +48,22 @@
       :disabled="loading"
     />
 
-    <div class="form-actions">
+    <div class="mt-2">
       <AppButton
         type="submit"
         variant="primary"
         :loading="loading"
-        class="submit-button"
+        class="w-full py-3"
       >
         Create Account
       </AppButton>
     </div>
 
-    <p class="form-toggle-text">
+    <p class="text-[0.85rem] text-text-muted m-0 text-center">
       Already have an account?
       <button
         type="button"
-        class="toggle-link-btn"
+        class="bg-transparent border-none text-accent font-medium cursor-pointer p-0 font-inherit hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         :disabled="loading"
         @click="$emit('switch-view', 'login')"
       >
@@ -118,53 +118,8 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  width: 100%;
-}
-
-.form-error-alert {
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-md, 8px);
-  background-color: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-align: left;
+.error-shake {
   animation: shake 0.4s ease-in-out;
-}
-
-.form-actions {
-  margin-top: 0.5rem;
-}
-
-.submit-button {
-  width: 100%;
-  padding-block: 0.75rem;
-}
-
-.form-toggle-text {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  margin: 0;
-  text-align: center;
-}
-
-.toggle-link-btn {
-  background: none;
-  border: none;
-  color: var(--color-accent);
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0;
-  font-family: inherit;
-}
-
-.toggle-link-btn:hover {
-  text-decoration: underline;
 }
 
 @keyframes shake {
@@ -173,3 +128,4 @@ const handleSubmit = async () => {
   75% { transform: translateX(6px); }
 }
 </style>
+

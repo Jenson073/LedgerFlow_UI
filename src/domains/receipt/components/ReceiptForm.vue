@@ -1,5 +1,5 @@
 <template>
-  <form class="receipt-form" @submit.prevent="handleSubmit">
+  <form class="flex flex-col gap-5 w-full" @submit.prevent="handleSubmit">
     <AppInput
       id="rec-merchant"
       v-model="merchantName"
@@ -48,19 +48,19 @@
       <option value="Other Expenses">Other Expenses</option>
     </AppSelect>
 
-    <div class="input-group">
-      <label for="rec-notes" class="input-label">Notes / Description</label>
+    <div class="flex flex-col gap-1.5 w-full text-left">
+      <label for="rec-notes" class="text-[0.85rem] font-medium text-text-base">Notes / Description</label>
       <textarea
         id="rec-notes"
         v-model="notes"
         placeholder="Describe what was purchased..."
         rows="3"
-        class="form-textarea"
+        class="w-full px-3.5 py-2.5 font-sans text-[0.95rem] text-text-base bg-bg-input border border-border rounded-md outline-none transition-all duration-200 box-border resize-y placeholder:text-text-muted/40 focus:border-accent focus:bg-bg-input-focus focus:shadow-[0_0_0_3px_var(--color-accent-subtle)]"
         :disabled="loading"
       ></textarea>
     </div>
 
-    <div class="form-actions">
+    <div class="flex justify-end gap-3 mt-2">
       <AppButton
         type="button"
         variant="text"
@@ -117,53 +117,3 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style scoped>
-.receipt-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  width: 100%;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-  width: 100%;
-  text-align: left;
-}
-
-.input-label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--color-text-base);
-}
-
-.form-textarea {
-  width: 100%;
-  padding: 0.625rem 0.875rem;
-  font-family: inherit;
-  font-size: 0.95rem;
-  color: var(--color-text-base);
-  background: var(--surface-bg-input, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  border-radius: var(--radius-md, 8px);
-  outline: none;
-  transition: all 0.2s;
-  box-sizing: border-box;
-  resize: vertical;
-}
-
-.form-textarea:focus {
-  border-color: var(--color-accent);
-  background: var(--surface-bg-input-focus, rgba(255, 255, 255, 0.08));
-  box-shadow: 0 0 0 3px var(--color-accent-subtle, rgba(139, 92, 246, 0.15));
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-</style>

@@ -1,40 +1,42 @@
 <template>
-  <Transition name="fade">
-    <div v-if="show" class="modal-overlay" @click.self="onOverlayClick">
-      <Transition name="scale" appear>
-        <div
-          class="modal-container"
-          role="dialog"
-          aria-modal="true"
-          :aria-labelledby="titleId"
-        >
-          <!-- Header -->
-          <div class="modal-header">
-            <h3 :id="titleId" class="modal-title">{{ title }}</h3>
-            <button
-              type="button"
-              class="close-button"
-              aria-label="Close modal"
-              @click="close"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-              </svg>
-            </button>
-          </div>
+  <Teleport to="body" :disabled="!isMounted">
+    <Transition name="fade">
+      <div v-if="show" class="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-slate-950/40 backdrop-blur-sm md:ps-64" @click.self="onOverlayClick">
+        <Transition name="scale" appear>
+          <div
+            class="modal-container relative w-full max-w-lg flex flex-col bg-bg-modal border border-border rounded-lg shadow-2xl backdrop-blur-3xl saturate-[180%] overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            :aria-labelledby="titleId"
+          >
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-5 border-b border-border">
+              <h3 :id="titleId" class="m-0 text-[1.15rem] font-semibold text-text-base">{{ title }}</h3>
+              <button
+                type="button"
+                class="flex items-center justify-center w-7 h-7 p-0 text-text-muted bg-transparent border-none rounded-full cursor-pointer transition-colors duration-200 hover:bg-white/5 hover:text-text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                aria-label="Close modal"
+                @click="close"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                  <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                </svg>
+              </button>
+            </div>
 
-          <!-- Body -->
-          <div class="modal-body">
-            <slot></slot>
+            <!-- Body -->
+            <div class="p-6 max-h-[80vh] overflow-y-auto scrollbar-thin">
+              <slot></slot>
+            </div>
           </div>
-        </div>
-      </Transition>
-    </div>
-  </Transition>
+        </Transition>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 interface Props {
   show: boolean;
@@ -49,6 +51,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   (e: 'close'): void;
 }>();
+
+const isMounted = ref(false);
 
 const titleId = `modal-title-${Math.random().toString(36).substring(2, 9)}`;
 
@@ -68,7 +72,6 @@ const handleEscape = (e: KeyboardEvent) => {
   }
 };
 
-// Lock body scroll when modal is active
 watch(
   () => props.show,
   (isShowing) => {
@@ -83,6 +86,7 @@ watch(
 );
 
 onMounted(() => {
+  isMounted.value = true;
   if (process.client) {
     window.addEventListener('keydown', handleEscape);
   }
@@ -97,83 +101,21 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  background-color: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(8px);
-}
-
 .modal-container {
-  position: relative;
-  width: 100%;
-  max-width: 32rem;
-  display: flex;
-  flex-direction: column;
-  background: var(--surface-bg-modal, rgba(30, 41, 59, 0.7));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  border-radius: var(--radius-lg, 12px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3),
-              0 8px 10px -6px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(24px) saturate(180%);
   animation: modalEnter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  overflow: hidden;
 }
 
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+@keyframes modalEnter {
+  from {
+    transform: scale(0.9) translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
 
-.modal-title {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--color-text-base);
-}
-
-.close-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  padding: 0;
-  color: var(--color-text-muted);
-  background: transparent;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.close-button:hover {
-  background-color: rgba(255, 255, 255, 0.06);
-  color: var(--color-text-base);
-}
-
-.close-button svg {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.modal-body {
-  padding: 1.5rem;
-  max-height: 80vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-scrollbar-thumb, rgba(255, 255, 255, 0.15)) transparent;
-}
-
-/* Modal Animations */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.25s ease;

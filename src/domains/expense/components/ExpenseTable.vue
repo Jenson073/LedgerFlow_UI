@@ -1,24 +1,26 @@
 <template>
-  <div class="records-container">
+  <div class="flex flex-col gap-5 w-full">
     <!-- Controls Bar -->
-    <div class="controls-bar">
-      <div class="search-filter-group">
+    <div class="flex justify-between items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-3 flex-wrap">
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Search expenses..."
-          class="table-search-input"
+          class="px-3.5 py-2 text-sm text-text-base bg-bg-input border border-border rounded-md outline-none transition-all duration-200 w-60 focus:border-accent focus:bg-bg-input-focus focus:shadow-[0_0_0_3px_var(--color-accent-subtle)]"
         />
-        <select v-model="categoryFilter" class="table-filter-select">
-          <option value="All">All Categories</option>
-          <option v-for="cat in categories" :key="cat" :value="cat">
-            {{ cat }}
-          </option>
-        </select>
+        <div class="relative flex items-center">
+          <select v-model="categoryFilter" class="pl-3.5 pr-8 py-2 text-sm text-text-base bg-bg-input border border-border rounded-md outline-none cursor-pointer transition-all duration-200 appearance-none bg-no-repeat bg-[right_0.5rem_center] bg-[length:1.25rem] focus:border-accent focus:bg-bg-input-focus focus:shadow-[0_0_0_3px_var(--color-accent-subtle)] bg-[url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%2394a3b8%22%3E%3Cpath fill-rule=%22evenodd%22 d=%22M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z%22 clip-rule=%22evenodd%22/%3E%3C/svg%3E')]">
+            <option value="All" class="bg-slate-800 text-slate-100">All Categories</option>
+            <option v-for="cat in categories" :key="cat" :value="cat" class="bg-slate-800 text-slate-100">
+              {{ cat }}
+            </option>
+          </select>
+        </div>
       </div>
       <AppButton variant="primary" @click="$emit('open-create-modal')">
         <template #icon>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="btn-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-[1.15rem] h-[1.15rem]">
             <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
           </svg>
         </template>
@@ -27,36 +29,36 @@
     </div>
 
     <!-- Table Container -->
-    <div class="table-responsive">
-      <div v-if="loading" class="table-loading-overlay">
-        <span class="table-spinner"></span>
-        <p>Updating expense logs...</p>
+    <div class="relative w-full overflow-x-auto rounded-md bg-white/[0.01] border border-border">
+      <div v-if="loading" class="absolute inset-0 bg-slate-950/65 backdrop-blur-sm flex flex-col items-center justify-center gap-2 z-10">
+        <span class="w-8 h-8 border-3 border-accent border-r-transparent rounded-full animate-spin"></span>
+        <p class="text-sm font-medium text-text-base">Updating expense logs...</p>
       </div>
 
-      <table class="data-table">
+      <table class="w-full border-collapse text-left text-sm">
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Payment Method</th>
-            <th>Amount</th>
-            <th>Notes</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Date</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Description</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Category</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Payment Method</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Amount</th>
+            <th class="px-4 py-3.5 font-semibold text-text-muted border-b border-border bg-white/[0.02]">Notes</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="filteredExpenses.length === 0">
-            <td colspan="6" class="empty-table-row">No expenses found.</td>
+            <td colspan="6" class="text-center p-12 text-text-muted">No expenses found.</td>
           </tr>
-          <tr v-for="expense in filteredExpenses" :key="expense.id" class="table-row">
-            <td class="bold-text">{{ formatDate(expense.date) }}</td>
-            <td>{{ expense.description }}</td>
-            <td>
-              <span class="category-pill">{{ expense.category }}</span>
+          <tr v-for="expense in filteredExpenses" :key="expense.id" class="hover:bg-white/[0.01] transition-colors">
+            <td class="p-4 border-b border-white/[0.04] text-text-base font-semibold">{{ formatDate(expense.date) }}</td>
+            <td class="p-4 border-b border-white/[0.04] text-text-base">{{ expense.description }}</td>
+            <td class="p-4 border-b border-white/[0.04] text-text-base">
+              <span class="inline-flex px-2 py-0.5 rounded-sm bg-danger-subtle text-danger text-[0.775rem] font-medium border border-danger/15">{{ expense.category }}</span>
             </td>
-            <td>{{ expense.paymentMethod }}</td>
-            <td class="amount-cell text-danger">{{ formatCurrency(expense.amount) }}</td>
-            <td class="notes-cell" :title="expense.notes">{{ expense.notes || '—' }}</td>
+            <td class="p-4 border-b border-white/[0.04] text-text-base">{{ expense.paymentMethod }}</td>
+            <td class="p-4 border-b border-white/[0.04] text-danger font-semibold tabular-nums">{{ formatCurrency(expense.amount) }}</td>
+            <td class="p-4 border-b border-white/[0.04] text-text-muted max-w-[15rem] truncate" :title="expense.notes">{{ expense.notes || '—' }}</td>
           </tr>
         </tbody>
       </table>
@@ -98,167 +100,3 @@ const filteredExpenses = computed(() => {
 });
 </script>
 
-<style scoped>
-.records-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  width: 100%;
-}
-
-.controls-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.search-filter-group {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.table-search-input {
-  padding: 0.5rem 0.875rem;
-  font-family: inherit;
-  font-size: 0.875rem;
-  color: var(--color-text-base);
-  background: var(--surface-bg-input, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  border-radius: var(--radius-md, 8px);
-  outline: none;
-  transition: all 0.2s;
-  min-width: 15rem;
-}
-
-.table-search-input:focus {
-  border-color: var(--color-accent);
-  background: var(--surface-bg-input-focus, rgba(255, 255, 255, 0.08));
-}
-
-.table-filter-select {
-  padding: 0.5rem 2rem 0.5rem 0.875rem;
-  font-family: inherit;
-  font-size: 0.875rem;
-  color: var(--color-text-base);
-  background: var(--surface-bg-input, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  border-radius: var(--radius-md, 8px);
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2394a3b8'%3E%3Cpath fill-rule='evenodd' d='M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z' clip-rule='evenodd'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  background-size: 1.25rem;
-}
-
-.table-filter-select option {
-  background: #1e293b;
-  color: #f8fafc;
-}
-
-.btn-icon {
-  width: 1.15rem;
-  height: 1.15rem;
-}
-
-.table-responsive {
-  position: relative;
-  width: 100%;
-  overflow-x: auto;
-  border-radius: var(--radius-md, 8px);
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-size: 0.9rem;
-}
-
-.data-table th {
-  padding: 0.875rem 1rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.data-table td {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.04));
-  color: var(--color-text-base);
-}
-
-.bold-text {
-  font-weight: 600;
-}
-
-.category-pill {
-  display: inline-flex;
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
-  background: rgba(239, 68, 68, 0.08);
-  color: #f87171;
-  font-size: 0.775rem;
-  font-weight: 500;
-  border: 1px solid rgba(239, 68, 68, 0.15);
-}
-
-.amount-cell {
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.text-danger {
-  color: #f87171 !important;
-}
-
-.notes-cell {
-  max-width: 15rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--color-text-muted);
-}
-
-.empty-table-row {
-  text-align: center;
-  padding: 3rem !important;
-  color: var(--color-text-muted);
-}
-
-/* Loading Overlay */
-.table-loading-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(4px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  z-index: 10;
-}
-
-.table-spinner {
-  width: 2rem;
-  height: 2rem;
-  border: 3px solid var(--color-accent);
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-</style>

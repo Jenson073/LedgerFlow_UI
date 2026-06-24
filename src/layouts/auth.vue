@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-layout">
+  <div class="relative min-h-screen w-full flex items-center justify-center p-6 overflow-y-auto">
     <!-- Glowing background elements -->
     <div class="glowing-mesh" aria-hidden="true">
       <div class="mesh-shape mesh-1"></div>
@@ -7,31 +7,15 @@
     </div>
 
     <!-- Page wrapper -->
-    <main class="auth-content">
+    <main class="flex items-center justify-center w-full z-10 animate-fade-in">
       <slot />
     </main>
   </div>
 </template>
 
 <style scoped>
-.auth-layout {
-  position: relative;
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  overflow-y: auto;
-}
-
-.auth-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  z-index: 10;
-  animation: fadeIn 0.4s ease-out;
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 @keyframes fadeIn {

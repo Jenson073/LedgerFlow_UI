@@ -1,13 +1,13 @@
 <template>
-  <div v-if="isAuthenticated" class="dashboard-page">
+  <div v-if="isAuthenticated" class="flex flex-col gap-7 w-full">
     <!-- Top Header Summary -->
-    <div class="dashboard-header">
-      <div class="header-titles">
-        <h1 class="welcome-title">Dashboard Overview</h1>
-        <p class="welcome-subtitle">Welcome back, <span class="accountant-name">{{ user?.name }}</span></p>
+    <div class="flex justify-between items-center gap-4">
+      <div class="text-left">
+        <h1 class="m-0 text-[1.6rem] font-bold text-text-base">Dashboard Overview</h1>
+        <p class="m-0 mt-1 text-[0.9rem] text-text-muted">Welcome back, <span class="text-accent-alt font-semibold">{{ user?.name }}</span></p>
       </div>
-      <div class="header-date" aria-hidden="true">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="calendar-icon">
+      <div class="flex items-center gap-2 px-3.5 py-2 rounded-md bg-bg-card border border-border text-[0.85rem] font-medium text-text-base" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[1.15rem] h-[1.15rem] text-accent">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
         </svg>
         <span>{{ formatDate(new Date()) }}</span>
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Metrics Row -->
-    <div class="metrics-grid">
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-4">
       <MetricCard
         title="Bank Ledger Balance"
         :value="formatCurrency(stats.bankBalance)"
@@ -23,20 +23,20 @@
         subtitle="Current operating cash flow"
       >
         <template #icon>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
             <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 0-1.5 0v1.008a7.002 7.002 0 0 0-4.75 6.742V13.5a1.5 1.5 0 0 1-1.5 1.5h-.75a.75.75 0 0 0 0 1.5h13.5a.75.75 0 0 0 0-1.5h-.75a1.5 1.5 0 0 1-1.5-1.5V10a7.002 7.002 0 0 0-4.75-6.742V2.25Z" clip-rule="evenodd" />
           </svg>
         </template>
       </MetricCard>
 
       <MetricCard
-        title="Total Income (Paid)"
+        title="Total Income"
         :value="formatCurrency(stats.totalIncome)"
         accent="success"
         :subtitle="'Monthly Avg: ' + formatCurrency(stats.averageIncome)"
       >
         <template #icon>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
             <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm1.25-11.25a.75.75 0 0 0-2.5 0v4.59L6.97 9.53a.75.75 0 1 0-1.06 1.06l3.25 3.25a.75.75 0 0 0 1.06 0l3.25-3.25a.75.75 0 1 0-1.06-1.06l-1.78 1.78V6.75Z" clip-rule="evenodd" />
           </svg>
         </template>
@@ -49,7 +49,7 @@
         :subtitle="'Monthly Avg: ' + formatCurrency(stats.averageExpense)"
       >
         <template #icon>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
             <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-11.25a.75.75 0 0 0-1.5 0v4.59L7.53 9.56a.75.75 0 0 0-1.06 1.06l3.25 3.25a.75.75 0 0 0 1.06 0l3.25-3.25a.75.75 0 0 0-1.06-1.06l-1.72 1.72V6.75Z" clip-rule="evenodd" />
           </svg>
         </template>
@@ -62,7 +62,7 @@
         subtitle="Unpaid customer invoices"
       >
         <template #icon>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
             <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-8-5a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 10 5Zm0 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd" />
           </svg>
         </template>
@@ -70,37 +70,37 @@
     </div>
 
     <!-- Chart & Summary grid -->
-    <div class="dashboard-grid">
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-[2fr_1fr]">
       <!-- SVG Chart -->
-      <div class="grid-col-2">
+      <div class="md:col-span-1">
         <StatsChart :trends="stats.monthlyTrends" />
       </div>
 
       <!-- Quick Analysis Card -->
-      <div class="analysis-box">
-        <h4 class="analysis-title">Financial Health Summary</h4>
-        <div class="analysis-metrics-list">
-          <div class="analysis-item">
+      <div class="bg-bg-card border border-border rounded-md p-6 backdrop-blur-xl saturate-[180%] flex flex-col gap-[1.15rem] text-left">
+        <h4 class="m-0 text-[1.05rem] font-semibold text-text-base">Financial Health Summary</h4>
+        <div class="flex flex-col gap-3.5">
+          <div class="flex justify-between text-[0.875rem] font-medium text-text-muted">
             <span>Net Cashflow Margin</span>
             <span :class="[stats.netCashflow >= 0 ? 'text-success' : 'text-danger']">
               {{ formatPercent((stats.netCashflow / (stats.totalIncome || 1)) * 100) }}
             </span>
           </div>
-          <div class="analysis-item">
+          <div class="flex justify-between text-[0.875rem] font-medium text-text-muted">
             <span>Income-to-Expense Ratio</span>
             <span :class="[stats.totalIncome >= stats.totalExpenses ? 'text-success' : 'text-danger']">
               {{ (stats.totalIncome / (stats.totalExpenses || 1)).toFixed(2) }}x
             </span>
           </div>
-          <div class="analysis-item">
+          <div class="flex justify-between text-[0.875rem] font-medium text-text-muted">
             <span>Uncollected Revenue</span>
-            <span class="text-warning">
+            <span class="text-warning font-bold">
               {{ formatPercent((stats.outstandingDues / ((stats.totalIncome + stats.outstandingDues) || 1)) * 100) }}
             </span>
           </div>
         </div>
 
-        <div class="insight-bubble">
+        <div class="p-3 rounded-md bg-white/[0.02] border border-white/[0.04] text-[0.8rem] leading-relaxed text-text-muted">
           <p v-if="stats.netCashflow >= 0">
             🟢 <strong>Healthy surplus:</strong> Ledger shows positive margins. Reinvest surplus or pay down pending liabilities.
           </p>
@@ -112,14 +112,14 @@
     </div>
 
     <!-- Data Tabs Section -->
-    <div class="tabs-container">
-      <div class="tabs-header">
-        <nav class="tabs-nav" aria-label="Dashboard records tabs">
+    <div class="flex flex-col gap-4">
+      <div class="border-b border-border">
+        <nav class="flex gap-5 overflow-x-auto no-scrollbar" aria-label="Dashboard records tabs">
           <button
             v-for="tab in tabItems"
             :key="tab.value"
             type="button"
-            :class="['tab-btn', { 'tab-active': activeTab === tab.value }]"
+            :class="['bg-transparent border-none px-1 py-3 font-inherit text-[0.9rem] font-medium text-text-muted cursor-pointer whitespace-nowrap border-b-2 border-transparent transition-all duration-200 hover:text-text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent', { 'text-accent border-b-accent font-semibold': activeTab === tab.value }]"
             @click="setActiveTab(tab.value)"
           >
             {{ tab.name }}
@@ -127,7 +127,7 @@
         </nav>
       </div>
 
-      <div class="tab-panel">
+      <div class="w-full">
         <InvoiceTable
           v-if="activeTab === 'invoices'"
           @open-create-modal="openModal('invoice')"
@@ -256,191 +256,12 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.dashboard-page {
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
-  width: 100%;
-}
-
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-}
-
-.header-titles {
-  text-align: left;
-}
-
-.welcome-title {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--color-text-base);
-}
-
-.welcome-subtitle {
-  margin: 0.25rem 0 0 0;
-  font-size: 0.9rem;
-  color: var(--color-text-muted);
-}
-
-.accountant-name {
-  color: var(--color-accent-alt, #c084fc);
-  font-weight: 600;
-}
-
-.header-date {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
-  border-radius: var(--radius-md, 8px);
-  background: var(--surface-bg-card, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--color-text-base);
-}
-
-.calendar-icon {
-  width: 1.15rem;
-  height: 1.15rem;
-  color: var(--color-accent);
-}
-
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: 1rem;
-}
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.25rem;
-}
-
-@media (min-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 2fr 1fr;
-  }
-  .grid-col-2 {
-    grid-column: span 1;
-  }
-}
-
-.analysis-box {
-  background: var(--surface-bg-card, rgba(30, 41, 59, 0.45));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  border-radius: var(--radius-md, 12px);
-  padding: 1.5rem;
-  backdrop-filter: blur(20px) saturate(180%);
-  display: flex;
-  flex-direction: column;
-  gap: 1.15rem;
-  text-align: left;
-}
-
-.analysis-title {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--color-text-base);
-}
-
-.analysis-metrics-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-.analysis-item {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-}
-
-.analysis-item span:last-child {
-  font-weight: 700;
-}
-
-.text-success {
-  color: #34d399;
-}
-
-.text-danger {
-  color: #f87171;
-}
-
-.text-warning {
-  color: #fbbf24;
-}
-
-.insight-bubble {
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-md, 8px);
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  font-size: 0.8rem;
-  line-height: 1.45;
-  color: var(--color-text-muted);
-}
-
-.insight-bubble p {
-  margin: 0;
-}
-
-.tabs-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.tabs-header {
-  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-}
-
-.tabs-nav {
-  display: flex;
-  gap: 1.25rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.tabs-nav::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-
-.tab-btn {
-  background: none;
-  border: none;
-  padding: 0.75rem 0.25rem;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
-}
-
-.tab-btn:hover {
-  color: var(--color-text-base);
-}
-
-.tab-active {
-  color: var(--color-accent);
-  border-bottom-color: var(--color-accent);
-  font-weight: 600;
-}
-
-.tab-panel {
-  width: 100%;
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 </style>
+

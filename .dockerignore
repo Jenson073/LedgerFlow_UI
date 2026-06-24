@@ -26,3 +26,12 @@ Dockerfile
 
 # Readme / Documentation
 README.md
+
+# Local environment & IDE folders
+.env
+.env.*
+.vscode/
+.idea/
+.agents/
+.gemini/
+*.md
