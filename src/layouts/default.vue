@@ -48,7 +48,7 @@
       <!-- Navigation Links -->
       <nav class="flex flex-col gap-1.5 flex-grow" aria-label="Main Navigation">
         <div class="text-[0.725rem] font-semibold text-text-muted uppercase tracking-wider mb-2 ps-2">Workspace</div>
-        <a href="#/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-[0.9rem] font-medium bg-accent-subtle text-accent hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">
+        <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-[0.9rem] font-medium bg-accent-subtle text-accent hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-[1.15rem] h-[1.15rem]">
             <path fill-rule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7a1 1 0 0 1-1.414 1.414L11 5.414V17a1 1 0 1 1-2 0V5.414L3.707 10.707a1 1 0 0 1-1.414-1.414l7-7Z" clip-rule="evenodd" />
           </svg>
@@ -56,29 +56,17 @@
         </a>
       </nav>
 
-      <!-- Active User Card / Logout -->
+      <!-- Static User Card -->
       <div class="mt-auto flex flex-col gap-4 pt-6 border-t border-border">
         <div class="flex items-center gap-3 p-1">
           <div class="w-9 h-9 rounded-full bg-gradient-to-br from-accent to-accent-alt text-bg-canvas flex items-center justify-center text-[0.85rem] font-bold">
-            {{ userInitials }}
+            LA
           </div>
           <div class="flex flex-col text-left">
-            <p class="m-0 text-[0.85rem] font-semibold text-text-base">{{ user?.name || 'Accountant' }}</p>
-            <p class="m-0 text-[0.75rem] text-text-muted">{{ user?.role || 'Staff Ledger' }}</p>
+            <p class="m-0 text-[0.85rem] font-semibold text-text-base">Ledger Administrator</p>
+            <p class="m-0 text-[0.75rem] text-text-muted">Firm Lead CPA</p>
           </div>
         </div>
-        <button
-          type="button"
-          class="flex items-center justify-center gap-2 w-full p-2 font-medium text-[0.85rem] text-text-muted bg-danger/5 border border-danger/10 rounded-md cursor-pointer transition-all duration-200 hover:bg-danger/10 hover:text-red-400 hover:border-danger/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent disabled:opacity-60 disabled:cursor-not-allowed"
-          :disabled="loading"
-          @click="onLogout"
-        >
-          <span v-if="loading" class="w-4 h-4 border-2 border-current border-r-transparent rounded-full animate-spin" aria-hidden="true"></span>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-[1.15rem] h-[1.15rem]">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
-          </svg>
-          Sign Out
-        </button>
       </div>
     </aside>
 
@@ -99,22 +87,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useRouter } from '#app';
-import { useAuth } from '~/domains/auth/composables/useAuth';
+import { ref } from 'vue';
 
-const router = useRouter();
-const { user, logout, loading } = useAuth();
 const isSidebarOpen = ref(false);
-
-const userInitials = computed(() => {
-  if (!user.value || !user.value.name) return 'AC';
-  const parts = user.value.name.split(' ');
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
-  return user.value.name.substring(0, 2).toUpperCase();
-});
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
@@ -122,13 +97,6 @@ const toggleSidebar = () => {
 
 const closeSidebar = () => {
   isSidebarOpen.value = false;
-};
-
-const onLogout = async () => {
-  const success = await logout();
-  if (success) {
-    router.push('/');
-  }
 };
 </script>
 

@@ -1,10 +1,10 @@
 <template>
-  <div v-if="isAuthenticated" class="flex flex-col gap-7 w-full">
+  <div class="flex flex-col gap-7 w-full">
     <!-- Top Header Summary -->
     <div class="flex justify-between items-center gap-4">
       <div class="text-left">
         <h1 class="m-0 text-[1.6rem] font-bold text-text-base">Dashboard Overview</h1>
-        <p class="m-0 mt-1 text-[0.9rem] text-text-muted">Welcome back, <span class="text-accent-alt font-semibold">{{ user?.name }}</span></p>
+        <p class="m-0 mt-1 text-[0.9rem] text-text-muted">Manage and monitor your firm's financial status.</p>
       </div>
       <div class="flex items-center gap-2 px-3.5 py-2 rounded-md bg-bg-card border border-border text-[0.85rem] font-medium text-text-base" aria-hidden="true">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[1.15rem] h-[1.15rem] text-accent">
@@ -179,8 +179,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from '#app';
-import { useAuth } from '~/domains/auth/composables/useAuth';
 import { useDashboard } from '../composables/useDashboard';
 import { formatDate, formatCurrency, formatPercent } from '~/shared/utils/formatters';
 import MetricCard from '../components/MetricCard.vue';
@@ -199,8 +197,6 @@ import ReceiptForm from '~/domains/receipt/components/ReceiptForm.vue';
 import ExpenseForm from '~/domains/expense/components/ExpenseForm.vue';
 import BankRecordForm from '~/domains/bank-record/components/BankRecordForm.vue';
 
-const router = useRouter();
-const { user, isAuthenticated, checkSession } = useAuth();
 const { stats, fetchAllData } = useDashboard();
 
 const activeTab = ref<'invoices' | 'receipts' | 'expenses' | 'bank'>('invoices');
@@ -244,14 +240,8 @@ const onFormSuccess = () => {
 };
 
 onMounted(async () => {
-  // Ensure session check
-  await checkSession();
-  if (!isAuthenticated.value) {
-    router.push('/');
-  } else {
-    // Prefetch all domain records
-    await fetchAllData();
-  }
+  // Prefetch all domain records
+  await fetchAllData();
 });
 </script>
 

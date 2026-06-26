@@ -1,11 +1,11 @@
 <template>
-  <NuxtLayout name="auth">
-    <LoginPage />
+  <NuxtLayout name="default">
+    <DashboardPage />
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import LoginPage from '~/domains/auth/pages/LoginPage.vue';
+import DashboardPage from '~/domains/dashboard/pages/DashboardPage.vue';
 
 // Page Metadata
 definePageMeta({
