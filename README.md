@@ -189,7 +189,7 @@ Within each domain folder (e.g., `src/domains/invoice/`), the code is divided in
 
 You can deploy the LedgerFlow stack using either a **unified Docker Compose** stack (all-in-one) or by running the **frontend standalone container** connected to the existing ZITADEL compose network.
 
-### Method 1: Unified Docker Compose (Not Yet Implemented)
+### Method 1: Unified Docker Compose (Single command)
 You can deploy the entire stack—including PostgreSQL, ZITADEL API, ZITADEL Login, Traefik proxy, and the LedgerFlow frontend—with a single command using the [docker-compose.yml](file:///home/user/Desktop/frontend_vue_nuxt/docker-compose.yml) at the root of the project:
 ```bash
 docker compose up -d --wait
@@ -198,7 +198,7 @@ This runs the frontend using the precompiled image `jenson07/ledgerflow-app-nuxt
 
 ---
 
-### Method 2: Standalone Frontend + ZITADEL Compose Network
+### Method 2: Standalone Frontend + ZITADEL Compose Network (For Deployment Vercel + Docker Host)
 If you prefer running ZITADEL/PostgreSQL using the existing compose setup in the `/home/user/Desktop/zitadel compose` directory, and running the Nuxt frontend separately as a standalone container:
 
 1. **Spin up ZITADEL Compose**:
