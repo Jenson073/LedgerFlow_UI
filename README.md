@@ -30,42 +30,36 @@ LedgerFlow is developed across two major version releases:
 
 ---
 
-## 🚀 Getting Started
-
-### Prerequisites
-- [Node.js](https://nodejs.org/) (version 18.0.0 or higher is recommended)
-- [Docker & Docker Compose](https://docs.docker.com/) (to run the self-hosted ZITADEL and PostgreSQL instance)
-
-### 1. Run ZITADEL IAM Infrastructure
-ZITADEL is running locally via Docker Compose. Navigate to the compose directory and spin it up:
-```bash
-cd "/home/user/Desktop/zitadel compose"
-docker compose up -d --wait
-```
-Once started, ZITADEL is accessible at:
-- **IAM Console / Issuer ID**: `http://localhost:8080/`
-- **Application Client ID**: `379545720174149635`
-
-### 2. Install Project Dependencies
-Initialize the Nuxt project libraries:
-```bash
-npm install
-```
-
-### 3. Run the Development Server
-Spin up the local hot-reloading development environment:
-```bash
-npm run dev
-```
-Navigate to `http://localhost:3000/`. You will be presented with the login screen prompting you to **Sign In with ZITADEL**.
-
----
-
 ## 🔐 ZITADEL SSO Integration Setup Guide
 
-LedgerFlow leverages ZITADEL to federate logins across multiple identity providers. Below are the steps to configure **Google SSO** and **Microsoft Entra ID** as external identity providers.
+LedgerFlow leverages ZITADEL to federate logins across multiple identity providers. Below is the configuration lifecycle for ZITADEL and external SSO providers.
 
-### 1. Google SSO (OAuth Client Setup)
+### 1. ZITADEL Initial Configuration (Project & PKCE)
+Before configuring external SSO providers, you need to register the LedgerFlow application inside your ZITADEL console:
+
+1. **Access ZITADEL Console**:
+   Go to `http://localhost:8080/` and sign in with the automatically generated ZITADEL administrative user.
+2. **Select or Create Organization**:
+   - In ZITADEL, ensure you have an active Organization (e.g. `LedgerFlow Org` or Default).
+3. **Create a Project**:
+   - Navigate to the **Projects** tab.
+   - Click **Create Project** -> Name it `LedgerFlow-Authentication`.
+4. **Register a Web Application**:
+   - Within the project page, click **New Application** to register a client.
+   - Name the application (e.g. `LedgerFlow Nuxt App`).
+   - Select **Web** (for server-side rendered applications like Nuxt 3/4).
+   - Click **Continue**.
+5. **Configure PKCE & Authentication Method**:
+   - Select **Code** (Authorization Code Flow) as the OAuth grant type.
+   - Choose **PKCE (Proof Key for Code Exchange)** as the authentication method to guarantee secure code-to-token code validation without hardcoding backend client secrets.
+6. **Set Redirect and Logout URIs**:
+   - Configure **Redirect URIs**: `http://localhost:3000/auth/callback`
+   - Configure **Post-Logout Redirect URIs**: `http://localhost:3000/`
+   - Click **Create**.
+7. **Obtain Client ID**:
+   - Copy the generated **Client ID** (e.g. `379545720174149635`) and update it in your application constants or environment variables.
+
+### 2. Google SSO (OAuth Client Setup)
 To allow users to sign in with Google accounts:
 1. Navigate to the [Google Cloud Console Auth Clients](https://console.cloud.google.com/auth/clients?authuser=1&organizationId=0&project=ledgerflow-authentication).
 2. Click **Create Credentials** -> **OAuth Client ID**.
@@ -76,7 +70,7 @@ To allow users to sign in with Google accounts:
    - `http://localhost:8080/ui/v2/login/login/externalidp/callback` (Standard callback endpoint where Google sends the auth code back to ZITADEL)
 6. Copy the generated **Client ID** and **Client Secret**.
 
-### 2. Microsoft Entra ID (App Registration Setup)
+### 3. Microsoft Entra ID (App Registration Setup)
 To allow users to sign in with Microsoft accounts:
 1. Navigate to the [Microsoft Entra App Registrations portal](https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade).
 2. Click **New Registration**.
@@ -86,7 +80,7 @@ To allow users to sign in with Microsoft accounts:
 5. Once registered, copy the **Application (client) ID** and **Directory (tenant) ID** from the overview panel.
 6. Under **Certificates & secrets**, click **New client secret** and copy the secret **Value**.
 
-### 3. Map Identity Providers (IDPs) in ZITADEL
+### 4. Map Identity Providers (IDPs) in ZITADEL
 Once the credentials are created on Google/Microsoft:
 1. Log in to the ZITADEL Console at `http://localhost:8080/` as an administrator.
 2. Go to **Instance Settings** -> **Identity Providers**.
@@ -114,7 +108,7 @@ sequenceDiagram
     User->>Nuxt: Clicks "Sign In with ZITADEL"
     Nuxt->>Nitro: GET /api/auth/login
     Note over Nitro: Generates state & PKCE code_verifier.<br/>Stores them in secure cookies.
-    Nitro-->>User: 320 Redirect to ZITADEL authorize endpoint
+    Nitro-->>User: 302 Redirect to ZITADEL authorize endpoint
     User->>Zitadel: GET http://localhost:8080/oauth/v2/authorize...
     
     alt Selects Google / Microsoft
@@ -139,10 +133,10 @@ sequenceDiagram
 ```
 
 ### Key Server-Side Route Implementations (Root `server/` Directory)
-- [server/api/auth/login.get.ts](file:///home/user/Desktop/frontend_vue_nuxt/server/api/auth/login.get.ts): Creates cryptographically secure OIDC `state` and PKCE `code_verifier`/`code_challenge` parameters. Sets temporary tracking cookies and triggers redirection to ZITADEL.
-- [server/routes/auth/callback.get.ts](file:///home/user/Desktop/frontend_vue_nuxt/server/routes/auth/callback.get.ts): Intercepts the final authorization code callback. It performs a backend `POST` query to exchange the code for access/ID/refresh tokens, deletes verification cookies, sets standard token cookies as `httpOnly`, and redirects to `/dashboard`.
-- [server/api/auth/logout.get.ts](file:///home/user/Desktop/frontend_vue_nuxt/server/api/auth/logout.get.ts): Clears access, ID, and refresh token cookies locally, then redirects to ZITADEL's `end_session` endpoint with an `id_token_hint` parameter to log the user out completely.
-- [server/api/auth/me.get.ts](file:///home/user/Desktop/frontend_vue_nuxt/server/api/auth/me.get.ts): Checks the `id_token` cookie, parses the base64url encoded payload segment, and extracts OIDC claims (e.g. `sub`, `name`, `email`) to serve current profile properties to the sidebar layouts.
+- [server/api/auth/login.get.ts](file:///home/user/Desktop/frontend_vue_nuxt/server/api/auth/login.get.ts): Creates OIDC `state` and PKCE `code_verifier`/`code_challenge` parameters. Sets temporary tracking cookies and redirects the browser to ZITADEL.
+- [server/routes/auth/callback.get.ts](file:///home/user/Desktop/frontend_vue_nuxt/server/routes/auth/callback.get.ts): Intercepts the final authorization code callback. It performs a backend `POST` query to exchange the code for access/ID/refresh tokens, deletes verification cookies, sets token cookies as `httpOnly`, and redirects to `/dashboard`.
+- [server/api/auth/logout.get.ts](file:///home/user/Desktop/frontend_vue_nuxt/server/api/auth/logout.get.ts): Clears token cookies locally, then redirects to ZITADEL's `end_session` endpoint with an `id_token_hint` parameter to log the user out completely.
+- [server/api/auth/me.get.ts](file:///home/user/Desktop/frontend_vue_nuxt/server/api/auth/me.get.ts): Checks the `id_token` cookie, decodes the JWT payload segment, and extracts OIDC claims (e.g. `sub`, `name`, `email`) to serve current profile properties to the default layout sidebar.
 
 ---
 
@@ -191,58 +185,32 @@ Within each domain folder (e.g., `src/domains/invoice/`), the code is divided in
 
 ---
 
-## 💡 Nuxt.js Concepts for Beginners
+## 🐳 Unified Docker Compose Deployment
 
-If you are new to Nuxt, here is a beginner-friendly breakdown of how the framework works under the hood:
+You can deploy the entire LedgerFlow stack—including PostgreSQL, ZITADEL API, ZITADEL Login, Traefik proxy, and the prebuilt LedgerFlow frontend application—with a single Docker Compose command.
 
-### 1. What happens during `npm run dev`?
-When you run `npm run dev`, Nuxt initiates a local server backed by **Vite**. 
-- Vite performs on-demand compiling: instead of bundling the whole application before starting, it serves files directly to the browser as modern ES Modules (ESM) and compiles only what you are currently viewing.
-- Nuxt generates type definitions and builds configuration links in the hidden `.nuxt/` folder to coordinate auto-imports.
+The project root is equipped with a unified [docker-compose.yml](file:///home/user/Desktop/frontend_vue_nuxt/docker-compose.yml) and an [.env](file:///home/user/Desktop/frontend_vue_nuxt/.env) file.
 
-### 2. File-Based Routing
-Nuxt handles page routing automatically based on files placed inside the `src/pages/` directory:
-- [src/pages/index.vue](file:///home/user/Desktop/frontend_vue_nuxt/src/pages/index.vue) maps to the root URL `/`.
-- [src/pages/dashboard.vue](file:///home/user/Desktop/frontend_vue_nuxt/src/pages/dashboard.vue) maps to `/dashboard`.
-
-You do **not** need to write a manual router config file. Nuxt reads the folder structure and generates the router for you behind the scenes.
-
-### 3. Layouts System
-Layouts are reusable wrapper templates defined in the `src/layouts/` directory:
-- [auth.vue](file:///home/user/Desktop/frontend_vue_nuxt/src/layouts/auth.vue): Provides the background styling mesh for our login screen.
-- [default.vue](file:///home/user/Desktop/frontend_vue_nuxt/src/layouts/default.vue): Implements the main dashboard grid structure, sidebar menu, user profile info, and sign-out buttons.
-
-### 4. Pinia State Stores
-Pinia manages reactive state sharing across different components:
-- When you add a new invoice in `<InvoiceForm />`, it dispatches a create action on `useInvoiceStore`.
-- Because the dashboard's KPI cards and SVG curves are bound to this store's state, Vue automatically triggers recalculations and re-renders them immediately.
-
----
-
-## 🐳 Docker Deployment
-
-You can run LedgerFlow inside a container. The project is equipped with a production-ready, multi-stage `Dockerfile`.
-
-### Pull from Docker Hub (Recommended)
-This application has been precompiled and pushed to Docker Hub. You can pull the latest image and run it directly without building locally:
+### 1. Run the Entire Stack
+To spin up all services simultaneously:
 ```bash
-# Pull the latest image from Docker Hub
-docker pull jenson07/ledgerflow-app-nuxt:latest
-
-# Run the container mapping it to port 3000
-docker run -p 3000:3000 jenson07/ledgerflow-app-nuxt:latest
+docker compose up -d --wait
 ```
+This command starts:
+- **PostgreSQL**: Database for ZITADEL.
+- **ZITADEL API & ZITADEL Login**: The IAM identity provider server (exposes ZITADEL on `http://localhost:8080/`).
+- **Traefik Proxy**: Port router proxy.
+- **LedgerFlow Frontend**: Using the precompiled image **`jenson07/ledgerflow-app-nuxt:zitadel-v1`** (exposes LedgerFlow on `http://localhost:3000/`).
 
-### Build the Docker Image Locally
-If you want to compile and build the container locally from the source files:
-```bash
-# Build the Docker image
-docker build -t ledgerflow-app .
-
-# Run the local container
-docker run -p 3000:3000 ledgerflow-app
+### 2. How Container Communication Resolves
+The frontend container communicates with ZITADEL using the host gateway mapping:
+```yaml
+    extra_hosts:
+      # Map localhost inside the container to the host machine gateway IP,
+      # allowing the Nuxt backend to communicate with ZITADEL on port 8080.
+      - "localhost:host-gateway"
 ```
-Once running, you can access the application at `http://localhost:3000`.
+This resolves `localhost` from within the frontend container back to the host machine gateway, allowing the Nuxt server-side token exchange API to reach ZITADEL on port `8080` seamlessly.
 
 ---
 
@@ -251,9 +219,9 @@ Once running, you can access the application at `http://localhost:3000`.
 If you run into issues while testing your ZITADEL or SSO integration, verify the following configurations:
 
 ### 1. `redirect_uri_mismatch` on ZITADEL
-- **Problem**: Occurs when ZITADEL redirects the user back to Nuxt, but the target Callback URL does not match what ZITADEL has configured for the client application.
+- **Problem**: Occurs when ZITADEL redirects the user back to Nuxt, but the Callback URL does not match what ZITADEL has configured for the client application.
 - **Fix**: Open the ZITADEL console, navigate to your Project -> App Settings, and ensure that the **Redirect URI** is explicitly set to:
-  `http://localhost:3000/auth/callback` (matching trailing slashes and ports exactly).
+  `http://localhost:3000/auth/callback` and post-logout redirect URI is `http://localhost:3000/` (matching trailing slashes and ports exactly).
 
 ### 2. `redirect_uri_mismatch` on Google or Microsoft
 - **Problem**: Occurs when Google or Microsoft redirects the user back to ZITADEL, but ZITADEL's callback URL does not match the allowed redirect list in Google Cloud or Microsoft Entra ID.
