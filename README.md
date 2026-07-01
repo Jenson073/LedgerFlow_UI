@@ -185,32 +185,42 @@ Within each domain folder (e.g., `src/domains/invoice/`), the code is divided in
 
 ---
 
-## 🐳 Unified Docker Compose Deployment
+## 🐳 Docker Deployment Methods
 
-You can deploy the entire LedgerFlow stack—including PostgreSQL, ZITADEL API, ZITADEL Login, Traefik proxy, and the prebuilt LedgerFlow frontend application—with a single Docker Compose command.
+You can deploy the LedgerFlow stack using either a **unified Docker Compose** stack (all-in-one) or by running the **frontend standalone container** connected to the existing ZITADEL compose network.
 
-The project root is equipped with a unified [docker-compose.yml](file:///home/user/Desktop/frontend_vue_nuxt/docker-compose.yml) and an [.env](file:///home/user/Desktop/frontend_vue_nuxt/.env) file.
-
-### 1. Run the Entire Stack
-To spin up all services simultaneously:
+### Method 1: Unified Docker Compose (Not Yet Implemented)
+You can deploy the entire stack—including PostgreSQL, ZITADEL API, ZITADEL Login, Traefik proxy, and the LedgerFlow frontend—with a single command using the [docker-compose.yml](file:///home/user/Desktop/frontend_vue_nuxt/docker-compose.yml) at the root of the project:
 ```bash
 docker compose up -d --wait
 ```
-This command starts:
-- **PostgreSQL**: Database for ZITADEL.
-- **ZITADEL API & ZITADEL Login**: The IAM identity provider server (exposes ZITADEL on `http://localhost:8080/`).
-- **Traefik Proxy**: Port router proxy.
-- **LedgerFlow Frontend**: Using the precompiled image **`jenson07/ledgerflow-app-nuxt:zitadel-v1`** (exposes LedgerFlow on `http://localhost:3000/`).
+This runs the frontend using the precompiled image `jenson07/ledgerflow-app-nuxt:zitadel-v1` and exposes it on `http://localhost:3000/`.
 
-### 2. How Container Communication Resolves
-The frontend container communicates with ZITADEL using the host gateway mapping:
-```yaml
-    extra_hosts:
-      # Map localhost inside the container to the host machine gateway IP,
-      # allowing the Nuxt backend to communicate with ZITADEL on port 8080.
-      - "localhost:host-gateway"
-```
-This resolves `localhost` from within the frontend container back to the host machine gateway, allowing the Nuxt server-side token exchange API to reach ZITADEL on port `8080` seamlessly.
+---
+
+### Method 2: Standalone Frontend + ZITADEL Compose Network
+If you prefer running ZITADEL/PostgreSQL using the existing compose setup in the `/home/user/Desktop/zitadel compose` directory, and running the Nuxt frontend separately as a standalone container:
+
+1. **Spin up ZITADEL Compose**:
+   ```bash
+   cd "/home/user/Desktop/zitadel compose"
+   docker compose up -d --wait
+   ```
+   This initializes ZITADEL on the Docker bridge network named `zitadel`.
+
+2. **Run the Standalone Nuxt Container**:
+   Run the frontend container connected to the same `zitadel` network. You **must** include the `--add-host=localhost:host-gateway` mapping so the frontend container's backend can resolve ZITADEL on `localhost:8080` via your host gateway:
+   ```bash
+   docker run -d \
+     --name ledgerflow-zitadel \
+     --network zitadel \
+     --add-host=localhost:host-gateway \
+     -p 3000:3000 \
+     jenson07/ledgerflow-app-nuxt:zitadel-v1
+   ```
+
+### Why `--add-host=localhost:host-gateway` is Required:
+Inside the standalone frontend container, `localhost` defaults to the container's own internal loopback interface (`127.0.0.1`). Since ZITADEL is running in a separate container, the frontend's backend code cannot connect to ZITADEL on `localhost:8080` without mapping. Adding `--add-host=localhost:host-gateway` tells Docker to route `localhost` requests back out to the host gateway where Traefik proxy is listening on port `8080`, facilitating smooth, secure OIDC token exchange.
 
 ---
 
